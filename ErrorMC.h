@@ -35,12 +35,36 @@
 #ifndef ERRORMC_H
 #define ERRORMC_H
 
+#include<iostream>
+#include<cstdio>
+#include<vector>
+#include<cmath>
+
+//GSL Libraries
+#include<gsl/gsl_rng.h> // GSL Random number generation
+#include<gsl/gsl_randist.h>  // GSL Random distributions
+#include<gsl/gsl_statistics_double.h> // for tests
+
+#include "ErrorMC.cpp" //file with functions implementations
+
 //=============================================================================
 // Function Headers
 //=============================================================================
 
 //Parameter Generator
-int GenParMC(vector<double>, vector<double>,gsl_rng*,vector<double>&);
+int GenParMC(std::vector<double>,std::vector<double>,
+             gsl_rng*,std::vector<double>&);
 
+//------------------------------------------------------------------------------
+//Error Propagation Calculation
+//Inputs: independent variable of the model (x)
+//vectors with parameters central values and uncertainties,
+//function with model and extra parameters (both defined by user),
+//maximum number of points to be calculated (user's choice).
+//It creats random number generator and performs MC to calculate
+//Returns: error, and mean value (by reference)
+double ErrorCalc
+(double,std::vector<double>,std::vector<double>,
+ double(*)(double,std::vector<double>,void*),void*,int,double&);
 
 #endif
