@@ -37,10 +37,11 @@
 #include<cmath>
 
 // //GSL Libraries
-// #include<gsl/gsl_rng.h> // GSL Random number generation
-// #include<gsl/gsl_randist.h>  // GSL Random distributions
+#include<gsl/gsl_rng.h> // GSL Random number generation
+#include<gsl/gsl_randist.h>  // GSL Random distributions
 
-// #include "ErrorMC.h" //header file
+// #include "ErrorMCdef.h" //header file
+#include "ErrorMC.h" //header file
 
 //==============================================================================
 // Function Implementations
@@ -82,8 +83,9 @@ int GenParMC
 //Returns: error, and mean value (by reference)
 double ErrorCalc
 (double x, std::vector<double> par_central, std::vector<double> par_sigma,
- double(*model)(double,std::vector<double>,void*), void *extra_par,
- int Nmax, double &average)
+ double(*model)(double,std::vector<double>,void*),
+ // funcmodel_t model,
+ void *extra_par, int Nmax, double &average)
 {
 
   //creating random number generator
