@@ -45,7 +45,12 @@
 #include<gsl/gsl_randist.h>  // GSL Random distributions
 #include<gsl/gsl_statistics_double.h> // for tests
 
-#include "ErrorMC.cpp" //file with functions implementations
+//#include "ErrorMCdef.h" //file with functions implementations
+
+
+//typedef double (*funcmodel_t) (double,std::vector<double>,void*);
+
+//#include "ErrorMC.cpp" //file with functions implementations
 
 //=============================================================================
 // Function Headers
@@ -65,6 +70,8 @@ int GenParMC(std::vector<double>,std::vector<double>,
 //Returns: error, and mean value (by reference)
 double ErrorCalc
 (double,std::vector<double>,std::vector<double>,
- double(*)(double,std::vector<double>,void*),void*,int,double&);
+ double(*)(double,std::vector<double>,void*),
+ //funcmodel_t,
+ void*,int,double&);
 
 #endif
