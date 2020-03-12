@@ -6,6 +6,8 @@
 
    *** Header file ***
 
+   Class definition
+
    Important notes and descriptions:
    ....
 
