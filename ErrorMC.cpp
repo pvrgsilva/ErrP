@@ -47,11 +47,37 @@
 // Function Implementations
 //==============================================================================
 
+//constructor
+ErrorMC::ErrorMC(){
+
+  //creating random number generator
+  //(for now, using default parameters)
+
+  unsigned long int seed = 0; //seed
+
+  const gsl_rng_type *T = gsl_rng_default;
+  gsl_rng *r = gsl_rng_alloc(T);
+  gsl_rng_set(r,seed);
+
+}
+
+void ErrorMC:SetParCentral(std::vector<double> user_info){
+  par_central = user_par;
+}
+
+void ErrorMC:SetParSigma(std::vector<double> user_info){
+  par_sigma = user_info;
+}
+
+void ErrorMC:SetExtraPar(void *user_info){
+  extra_par = user_info;
+}
+
 //Parameter Generator
 //Gaussian distribution
 //Inputs: vectors with parameters central values and uncertainties,
 // pointer to random number generator (GSL) and vector to store result
-int GenParMC
+int ErrorMC::GenParMC
 (std::vector<double> par_central, std::vector<double> par_sigma,
  gsl_rng *r ,std::vector<double> &result)
 {
@@ -81,21 +107,21 @@ int GenParMC
 //maximum number of points to be calculated (user's choice).
 //It creats random number generator and performs MC to calculate
 //Returns: error, and mean value (by reference)
-double ErrorCalc
+double ErrorMC::ErrorCalc
 (double x, std::vector<double> par_central, std::vector<double> par_sigma,
  double(*model)(double,std::vector<double>,void*),
  // funcmodel_t model,
  void *extra_par, int Nmax, double &average)
 {
 
-  //creating random number generator
-  //(for now, using default parameters)
-
-  unsigned long int seed = 0; //seed
-
-  const gsl_rng_type *T = gsl_rng_default;
-  gsl_rng *r = gsl_rng_alloc(T);
-  gsl_rng_set(r,seed);
+  // //creating random number generator
+  // //(for now, using default parameters)
+  //
+  // unsigned long int seed = 0; //seed
+  //
+  // const gsl_rng_type *T = gsl_rng_default;
+  // gsl_rng *r = gsl_rng_alloc(T);
+  // gsl_rng_set(r,seed);
 
   std::vector<double> Ymc, parmc;
   double y; int status;
