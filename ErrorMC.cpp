@@ -56,30 +56,78 @@ ErrorMC::ErrorMC(){
   unsigned long int seed = 0; //seed
 
   const gsl_rng_type *T = gsl_rng_default;
-  gsl_rng *r = gsl_rng_alloc(T);
+  r = gsl_rng_alloc(T);
   gsl_rng_set(r,seed);
 
 }
 
-void ErrorMC:SetParCentral(std::vector<double> user_info){
-  par_central = user_par;
+//destructor
+ErrorMC::~ErrorMC(){
+  // gsl_rng_free(r); // free memory associated to random number generator
+  std::cout << "Releasing memory...\n";
 }
 
-void ErrorMC:SetParSigma(std::vector<double> user_info){
+void ErrorMC::SetParCentral(std::vector<double> user_info){
+  par_central = user_info;
+
+  // int Npar = par_central.size();
+  // std::cout << "Testing passing parameters\n";
+  // for(int i = 0;i<Npar;i++){
+  //   std::cout << par_central[i] << "\n";
+  // } //working
+}
+
+void ErrorMC::SetParSigma(std::vector<double> user_info){
   par_sigma = user_info;
+
+  // int Npar = par_sigma.size();
+  // std::cout << "Testing passing parameter errors\n";
+  // for(int i = 0;i<Npar;i++){
+  //   std::cout << par_sigma[i] << "\n";
+  // } //working
+
 }
 
-void ErrorMC:SetExtraPar(void *user_info){
+void ErrorMC::SetExtraPar(void *user_info){
+
+  // std::cout << "Testing Extra parameter copy\n";
+
   extra_par = user_info;
+
+  // std::cout << "Copied?\n";
+  // std::cout << "Size: " << sizeof(extra_par) << "\n";
+  // std::cout << "Info " << *(float*)extra_par << "\n";
+  // std::cout << "Yes!!\n";
+  //working!!!
 }
+
+void ErrorMC::SetN(int Nuser){
+  Nmax = Nuser;
+}
+
+
+void ErrorMC::SetModel(funcmodel_t user_func){
+
+  std::cout << "Setting function\n";
+
+  model = user_func;
+
+  std::cout << "I think it worked\n";
+}
+
 
 //Parameter Generator
 //Gaussian distribution
 //Inputs: vectors with parameters central values and uncertainties,
-// pointer to random number generator (GSL) and vector to store result
+// pointer to random numbn";
+  // std::cout << "Size: " << sizeof(extra_par) << "\n";
+  // std::cout << "Info " << *(float*)extra_par << "\n";
+  // std::cout << "Yes!!\n"er generator (GSL) and vector to store result
+
 int ErrorMC::GenParMC
-(std::vector<double> par_central, std::vector<double> par_sigma,
- gsl_rng *r ,std::vector<double> &result)
+(
+// std::vector<double> par_central, std::vector<double> par_sigma,gsl_rng *r ,
+ std::vector<double> &result)
 {
   int npar = par_central.size();
   int npar_sigma = par_sigma.size();
@@ -107,11 +155,18 @@ int ErrorMC::GenParMC
 //maximum number of points to be calculated (user's choice).
 //It creats random number generator and performs MC to calculate
 //Returns: error, and mean value (by reference)
+// double ErrorMC::ErrorCalc
+// (double x, std::vector<double> par_central, std::vector<double> par_sigma,
+//  double(*model)(double,std::vector<double>,void*),
+//  // funcmodel_t model,
+//  void *extra_par, int Nmax, double &average)
 double ErrorMC::ErrorCalc
-(double x, std::vector<double> par_central, std::vector<double> par_sigma,
- double(*model)(double,std::vector<double>,void*),
+(double x,// std::vector<double> par_central, std::vector<double> par_sigma,
+ // double(*model)(double,std::vector<double>,void*),
  // funcmodel_t model,
- void *extra_par, int Nmax, double &average)
+ //void *extra_par,
+ // int Nmax,
+ double &average)
 {
 
   // //creating random number generator
@@ -128,7 +183,7 @@ double ErrorMC::ErrorCalc
 
 // loop for calculations
   for(int i=0;i<Nmax;++i){
-    status = GenParMC(par_central,par_sigma,r,parmc);
+    status = GenParMC(parmc);//(par_central,par_sigma,r,parmc);
     if(status==-1) continue; //-1 means error, and should skip lines below
     y = model(x,parmc,extra_par);//
     Ymc.push_back(y);
@@ -166,11 +221,11 @@ double ErrorMC::ErrorCalc
     sum2 = sum2 + Delta*Delta;
   }
 
-  sdev = sqrt(sum2/(Ndata-1.0)); // problem?
+  sdev = sqrt(sum2/(Ndata-1.0));
 
   // sdev = gsl_stats_sd_m(aux,1,Ndata,average);
 
-  gsl_rng_free(r); // free memory associated to random number generator
+  // gsl_rng_free(r); // free memory associated to random number generator
   Ymc.clear();
   parmc.clear();
 
