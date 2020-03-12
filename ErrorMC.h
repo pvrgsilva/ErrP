@@ -55,25 +55,53 @@
 //#include "ErrorMC.cpp" //file with functions implementations
 
 //=============================================================================
+// Class declaration
+//=============================================================================
+
+class ErrorMC {
+// private:
+  std::vector<double> par_central;
+  std::vector<double> par_sigma;
+  std::vector<double> result;
+  gsl_rng *r;
+  int Nmax;
+  double average;
+  void *extra_par;
+
+public:
+
+  ErrorMC(); //constructor (create others?)
+  void SetModel();
+  void SetParCentral(std::vector<double>);
+  void SetParSigma(std::vector<double>);
+  // void SetParCov(); //to be implemented
+  void SetExtraPar(void *);
+
+//Parameter Generator
+  int GenParMC(std::vector<double>,std::vector<double>,gsl_rng*,std::vector<double>&);
+
+  //Error Propagation Calculation
+  //Inputs: independent variable of the model (x)
+  //vectors with parameters central values and uncertainties,
+  //function with model and extra parameters (both defined by user),
+  //maximum number of points to be calculated (user's choice).
+  //It creats random number generator and performs MC to calculate
+  //Returns: error, and mean value (by reference)
+    double ErrorCalc
+    (double,std::vector<double>,std::vector<double>,
+    double(*)(double,std::vector<double>,void*),
+    //funcmodel_t,
+    void*,int,double&);
+
+};
+
+//=============================================================================
 // Function Headers
 //=============================================================================
 
-//Parameter Generator
-int GenParMC(std::vector<double>,std::vector<double>,
-             gsl_rng*,std::vector<double>&);
+
 
 //------------------------------------------------------------------------------
-//Error Propagation Calculation
-//Inputs: independent variable of the model (x)
-//vectors with parameters central values and uncertainties,
-//function with model and extra parameters (both defined by user),
-//maximum number of points to be calculated (user's choice).
-//It creats random number generator and performs MC to calculate
-//Returns: error, and mean value (by reference)
-double ErrorCalc
-(double,std::vector<double>,std::vector<double>,
- double(*)(double,std::vector<double>,void*),
- //funcmodel_t,
- void*,int,double&);
+
 
 #endif
