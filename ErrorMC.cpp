@@ -86,7 +86,7 @@ ErrorMC::ErrorMC(std::string user_method, unsigned long int user_seed, int Nuser
 
   seed = user_seed; //seed
   Nmax = Nuser;
-  
+
   SetRandMethod(user_method);
 
   // rng_type = gsl_rng_default;
@@ -199,7 +199,12 @@ int ErrorMC::GenParMC
 
 
   for(int i=0; i<npar;i++){
-    result.push_back(gsl_ran_gaussian(r,par_sigma.at(i)) + par_central.at(i));
+    if(par_sigma.at(i)!=0){
+      result.push_back(gsl_ran_gaussian(r,par_sigma.at(i)) + par_central.at(i));
+    }else{
+      result.push_back(par_central.at(i)); // if error = 0 (fixed parameter), do not change
+    }
+
   }
 
   return 0;
