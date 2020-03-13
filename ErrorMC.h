@@ -41,6 +41,7 @@
 #include<cstdio>
 #include<vector>
 #include<cmath>
+#include<string>
 
 //GSL Libraries
 #include<gsl/gsl_rng.h> // GSL Random number generation
@@ -63,11 +64,13 @@ class ErrorMC {
   std::vector<double> par_central;
   std::vector<double> par_sigma;
   // std::vector<double> result;
-  gsl_rng *r;
   void *extra_par;
   funcmodel_t model;
   int Nmax;
-
+  unsigned long int seed;
+  gsl_rng *r;
+  const gsl_rng_type *rng_type;
+  // string rand_method;
 public:
   double average;
 
@@ -75,6 +78,9 @@ public:
   ~ErrorMC(); //destructor
   void SetModel();
   void SetN(int);
+  void SetSeed(unsigned long int);
+  // void SetDist(??);
+  void SetRandMethod(std::string);
   void SetParCentral(std::vector<double>);
   void SetParSigma(std::vector<double>);
   // void SetParCov(); //to be implemented
