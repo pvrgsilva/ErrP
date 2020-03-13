@@ -75,6 +75,8 @@ public:
   double average;
 
   ErrorMC(); //constructor (create others?)
+  ErrorMC(std::string, unsigned long int); //constructor 2
+  ErrorMC(std::string, unsigned long int, int); //constructor 3
   ~ErrorMC(); //destructor
   void SetModel();
   void SetN(int);
