@@ -55,8 +55,9 @@ ErrorMC::ErrorMC(){
 
   unsigned long int seed = 0; //seed
 
-  const gsl_rng_type *T = gsl_rng_default;
-  r = gsl_rng_alloc(T);
+  // const gsl_rng_type *
+  rng_type = gsl_rng_default;
+  r = gsl_rng_alloc(rng_type);
   gsl_rng_set(r,seed);
 
 }
@@ -105,14 +106,38 @@ void ErrorMC::SetN(int Nuser){
   Nmax = Nuser;
 }
 
+void ErrorMC::SetSeed(unsigned long int seed_user){
+  seed = seed_user;
+}
 
+void ErrorMC::SetRandMethod(std::string user_method){
+
+  if(user_method.compare("default")==0){
+    rng_type = gsl_rng_default;
+  }
+  if(user_method.compare("mt19937")==0){
+    rng_type = gsl_rng_mt19937;
+  }
+  if(user_method.compare("taus")==0){
+    rng_type = gsl_rng_taus;
+  }
+  if(user_method.compare("taus2")==0){
+    rng_type = gsl_rng_taus2;
+  }
+  if(user_method.compare("ranlux")==0){
+    rng_type = gsl_rng_ranlxs0;
+  }
+  if(user_method.compare("ranlux1")==0){
+    rng_type = gsl_rng_ranlxs1;
+  }
+  if(user_method.compare("ranlux2")==0){
+    rng_type = gsl_rng_ranlxs2;
+  }
+  //add more ...
+
+}
 void ErrorMC::SetModel(funcmodel_t user_func){
-
-  std::cout << "Setting function\n";
-
   model = user_func;
-
-  std::cout << "I think it worked\n";
 }
 
 
