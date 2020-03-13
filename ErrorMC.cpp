@@ -40,23 +40,58 @@
 #include<gsl/gsl_rng.h> // GSL Random number generation
 #include<gsl/gsl_randist.h>  // GSL Random distributions
 
-// #include "ErrorMCdef.h" //header file
 #include "ErrorMC.h" //header file
 
 //==============================================================================
 // Function Implementations
 //==============================================================================
 
-//constructor
+//default constructor (default parameters)
 ErrorMC::ErrorMC(){
 
   //creating random number generator
-  //(for now, using default parameters)
 
-  unsigned long int seed = 0; //seed
+  seed = 0; //seed
 
-  // const gsl_rng_type *
   rng_type = gsl_rng_default;
+
+ //Tried move to GenParMC, but not worked
+  r = gsl_rng_alloc(rng_type);
+  gsl_rng_set(r,seed);
+
+}
+
+
+//Constructor (w/ parameters passed by the user)
+ErrorMC::ErrorMC(std::string user_method, unsigned long int user_seed){
+
+  //creating random number generator
+
+  seed = user_seed; //seed
+
+  SetRandMethod(user_method);
+
+  // rng_type = gsl_rng_default;
+
+ //Tried move to GenParMC, but not worked
+  r = gsl_rng_alloc(rng_type);
+  gsl_rng_set(r,seed);
+
+}
+
+//Constructor (w/ parameters passed by the user)
+ErrorMC::ErrorMC(std::string user_method, unsigned long int user_seed, int Nuser){
+
+  //creating random number generator
+
+  seed = user_seed; //seed
+  Nmax = Nuser;
+  
+  SetRandMethod(user_method);
+
+  // rng_type = gsl_rng_default;
+
+ //Tried move to GenParMC, but not worked
   r = gsl_rng_alloc(rng_type);
   gsl_rng_set(r,seed);
 
