@@ -105,6 +105,7 @@ ErrorMC::~ErrorMC(){
 
 void ErrorMC::SetParCentral(std::vector<double> user_info){
   par_central = user_info;
+  Npar = par_central.size();
 
   // int Npar = par_central.size();
   // std::cout << "Testing passing parameters\n";
@@ -123,6 +124,35 @@ void ErrorMC::SetParSigma(std::vector<double> user_info){
   // } //working
 
 }
+
+void ErrorMC::SetParCov(gsl_matrix *user_matrix){
+
+  if(Npar == 0){
+    std::cout << "\nPlease, set parameter values first\n";
+  }else{
+    covmatrix = gsl_matrix_alloc(Npar,Npar);
+    gsl_matrix_memcpy(covmatrix, user_matrix);
+  }
+
+}
+
+
+void ErrorMC::SetParCov(const char *file_path){
+
+  if(Npar == 0){
+    std::cout << "\nPlease, set parameter values first\n";
+  }else{
+    covmatrix = gsl_matrix_alloc(Npar,Npar);
+    FILE *mfile = fopen(file_path,"r");
+    int status = gsl_matrix_fscanf(mfile,covmatrix);
+
+    if(status==0){
+      std::cout << "\nMatrix elements read with success from file.\n";
+    }
+    fclose(mfile);
+  }
+}
+
 
 void ErrorMC::SetExtraPar(void *user_info){
 
