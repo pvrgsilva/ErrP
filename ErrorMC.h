@@ -42,8 +42,12 @@
 #include<vector>
 #include<cmath>
 #include<string>
+#include<fstream>
 
 //GSL Libraries
+#include<gsl/gsl_vector.h> // GSL Vectors
+#include<gsl/gsl_matrix.h> // GSL Matrices
+#include<gsl/gsl_linalg.h> // GSL Linear Algebra
 #include<gsl/gsl_rng.h> // GSL Random number generation
 #include<gsl/gsl_randist.h>  // GSL Random distributions
 #include<gsl/gsl_statistics_double.h> // for tests
@@ -67,9 +71,12 @@ class ErrorMC {
   void *extra_par;
   funcmodel_t model;
   int Nmax;
+  int Npar;
   unsigned long int seed;
   gsl_rng *r;
+  gsl_matrix *covmatrix; //new
   const gsl_rng_type *rng_type;
+
   // string rand_method;
 public:
   double average;
@@ -85,7 +92,8 @@ public:
   void SetRandMethod(std::string);
   void SetParCentral(std::vector<double>);
   void SetParSigma(std::vector<double>);
-  // void SetParCov(); //to be implemented
+  void SetParCov(gsl_matrix *); //to be implemented
+  void SetParCov(const char *);
   void SetExtraPar(void *);
   void SetModel(funcmodel_t);
 
