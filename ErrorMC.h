@@ -101,6 +101,9 @@ public:
   // int GenParMC(std::vector<double>,std::vector<double>,gsl_rng*,std::vector<double>&);
   int GenParMC(std::vector<double>&);
 
+//Parameter Generator with Covariance
+  int GenParMCCov(std::vector<double>&);
+
   //Error Propagation Calculation
   //Inputs: independent variable of the model (x)
   //vectors with parameters central values and uncertainties,
@@ -118,14 +121,27 @@ public:
      // funcmodel_t,
      // int,
      double&);
+
+
+//Error Propagation Calculation with Covariance
+//Inputs: independent variable of the model (x)
+//vectors with parameters central values and uncertainties,
+//function with model and extra parameters (both defined by user),
+//maximum number of points to be calculated (user's choice).
+//It creats random number generator and performs MC to calculate
+//Returns: error, and mean value (by reference)
+  double ErrorCalcCov
+  // (double,std::vector<double>,std::vector<double>,
+  // double(*)(double,std::vector<double>,void*),
+  // //funcmodel_t,
+  // void*,int,double&);
+  (double,
+   // double(*)(double,std::vector<double>,void*),
+   // funcmodel_t,
+   // int,
+   double&);
+
 };
-
-//=============================================================================
-// Function Headers
-//=============================================================================
-
-
-
 //------------------------------------------------------------------------------
 
 
