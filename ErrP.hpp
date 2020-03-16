@@ -48,6 +48,7 @@
 #include<gsl/gsl_vector.h> // GSL Vectors
 #include<gsl/gsl_matrix.h> // GSL Matrices
 #include<gsl/gsl_linalg.h> // GSL Linear Algebra
+#include<gsl/gsl_blas.h>   // GSL BLAS
 #include<gsl/gsl_rng.h> // GSL Random number generation
 #include<gsl/gsl_randist.h>  // GSL Random distributions
 #include<gsl/gsl_statistics_double.h> // for tests
@@ -103,6 +104,7 @@ public:
 //Inputs: independent variable of the model
 //        and vector to store gradient components
   int CalcGrad(double,std::vector<double>&);
+  double ErrorCalcGrad(double x);
 
 //------------------------------- MONTE CARLO --------------------------------//
 //Parameter Generator (Monte Carlo)
