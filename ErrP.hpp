@@ -75,6 +75,7 @@ class ErrP {
   unsigned long int seed;
   gsl_rng *r;
   gsl_matrix *covmatrix; //new
+  gsl_matrix *covmatrix_fc; //after Cholesky factorization (used only for MC)
   const gsl_rng_type *rng_type;
 
   // string rand_method;
