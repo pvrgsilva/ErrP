@@ -134,8 +134,8 @@ void ErrP::SetParCov(gsl_matrix *user_matrix){
     gsl_matrix_memcpy(covmatrix, user_matrix);
 
     //perform Cholesky decomposition (needed for error propagation)
-    covmatrix_fc = gsl_matrix_alloc(Npar,Npar)
-    gsl_matrix_memcpy(covmatrix_fc, user_matrix);
+    covmatrix_fc = gsl_matrix_alloc(Npar,Npar);
+    gsl_matrix_memcpy(covmatrix_fc, covmatrix);
     gsl_linalg_cholesky_decomp1(covmatrix_fc);
   }
 
@@ -157,8 +157,8 @@ void ErrP::SetParCov(const char *file_path){
     fclose(mfile);
 
     //perform Cholesky decomposition (needed for error propagation)
-    covmatrix_fc = gsl_matrix_alloc(Npar,Npar)
-    gsl_matrix_memcpy(covmatrix_fc, user_matrix);
+    covmatrix_fc = gsl_matrix_alloc(Npar,Npar);
+    gsl_matrix_memcpy(covmatrix_fc, covmatrix);
     gsl_linalg_cholesky_decomp1(covmatrix_fc);
   }
 
@@ -246,6 +246,35 @@ int ErrP::CalcGrad(double x,std::vector<double> &grad){
 
 }
 
+double ErrP::ErrorCalcGrad(double x){
+
+  std::vector<double> grad_aux;
+  CalcGrad(x,grad_aux);
+
+  gsl_vector *grad = gsl_vector_alloc(Npar);
+  for(int i=0;i<Npar;i++){
+    gsl_vector_set(grad,i,grad_aux.at(i));
+  }
+
+  gsl_vector *prodSigmaGrad = gsl_vector_alloc(Npar);
+
+//do product CovMatrix*Grad(model) = vec(v)
+  gsl_blas_dsymv(CblasLower,1,covmatrix,grad,0,prodSigmaGrad);
+
+
+  double result=0;
+
+//do product Transpose(Grad(model))*vec(v)
+  gsl_blas_ddot(grad,prodSigmaGrad,&result);
+
+  double error = sqrt(result);
+
+  grad_aux.clear();
+  gsl_vector_free(grad);
+  gsl_vector_free(prodSigmaGrad);
+
+  return error;
+}
 
 
 
