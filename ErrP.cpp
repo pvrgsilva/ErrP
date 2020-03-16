@@ -134,7 +134,9 @@ void ErrP::SetParCov(gsl_matrix *user_matrix){
     gsl_matrix_memcpy(covmatrix, user_matrix);
 
     //perform Cholesky decomposition (needed for error propagation)
-    gsl_linalg_cholesky_decomp1(covmatrix);
+    covmatrix_fc = gsl_matrix_alloc(Npar,Npar)
+    gsl_matrix_memcpy(covmatrix_fc, user_matrix);
+    gsl_linalg_cholesky_decomp1(covmatrix_fc);
   }
 
 }
@@ -155,7 +157,9 @@ void ErrP::SetParCov(const char *file_path){
     fclose(mfile);
 
     //perform Cholesky decomposition (needed for error propagation)
-    gsl_linalg_cholesky_decomp1(covmatrix);
+    covmatrix_fc = gsl_matrix_alloc(Npar,Npar)
+    gsl_matrix_memcpy(covmatrix_fc, user_matrix);
+    gsl_linalg_cholesky_decomp1(covmatrix_fc);
   }
 
 
@@ -219,28 +223,31 @@ void ErrP::SetModel(funcmodel_t user_func){
 //Gradient of function model
 //Inputs: independent variable of the model
 //        and vector to store gradient components
-  int ErrP::CalcGrad(double x,std::vector<double> &grad){
+int ErrP::CalcGrad(double x,std::vector<double> &grad){
 
-    double eps = 10e-8;
+  double eps = 10e-8;
 
-    // std::vector<double> par_aux = par_central;
-    std::vector<double> par_deriv;
-    par_deriv = par_central;
-    double deriv,delta;
+  // std::vector<double> par_aux = par_central;
+  std::vector<double> par_deriv;
+  par_deriv = par_central;
+  double deriv,delta;
 
-    for(int i = 0; i<Npar; i++){
-      par_deriv.at(i) = par_central.at(i) + eps;
-      delta = model(x,par_deriv,extra_par) - model(x,par_central,extra_par);
-      deriv = delta/eps;
-      grad.push_back(deriv);
-      par_deriv.at(i) = par_central.at(i);
-    }
-
-    par_deriv.clear();
-
-    return 0;
-
+  for(int i = 0; i<Npar; i++){
+    par_deriv.at(i) = par_central.at(i) + eps;
+    delta = model(x,par_deriv,extra_par) - model(x,par_central,extra_par);
+    deriv = delta/eps;
+    grad.push_back(deriv);
+    par_deriv.at(i) = par_central.at(i);
   }
+
+  par_deriv.clear();
+
+  return 0;
+
+}
+
+
+
 
 //------------------------------- MONTE CARLO --------------------------------//
 
@@ -295,7 +302,7 @@ int ErrP::GenParMCCov(std::vector<double> &result)
     gsl_vector_set(mu,i,par_central.at(i));
   }
 
-  gsl_ran_multivariate_gaussian(r,mu,covmatrix,res_aux);
+  gsl_ran_multivariate_gaussian(r,mu,covmatrix_fc,res_aux);
 
   for(int i=0; i<Npar;i++){
     result.push_back(gsl_vector_get(res_aux,i));
