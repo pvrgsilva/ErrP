@@ -216,7 +216,31 @@ void ErrP::SetModel(funcmodel_t user_func){
 }
 
 //------------------------------- DERIVATIVES --------------------------------//
+//Gradient of function model
+//Inputs: independent variable of the model
+//        and vector to store gradient components
+  int ErrP::CalcGrad(double x,std::vector<double> &grad){
 
+    double eps = 10e-8;
+
+    // std::vector<double> par_aux = par_central;
+    std::vector<double> par_deriv;
+    par_deriv = par_central;
+    double deriv,delta;
+
+    for(int i = 0; i<Npar; i++){
+      par_deriv.at(i) = par_central.at(i) + eps;
+      delta = model(x,par_deriv,extra_par) - model(x,par_central,extra_par);
+      deriv = delta/eps;
+      grad.push_back(deriv);
+      par_deriv.at(i) = par_central.at(i);
+    }
+
+    par_deriv.clear();
+
+    return 0;
+
+  }
 
 //------------------------------- MONTE CARLO --------------------------------//
 
