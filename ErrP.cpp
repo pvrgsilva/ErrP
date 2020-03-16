@@ -1,7 +1,7 @@
 /*
 ================================================================================
-   ErrorMC
-   A Monte Carlo Error Propagation
+   ErrP
+   A Class for (Numerical) Error Propagation
 ================================================================================
 
    *** File with functions implementations ***
@@ -40,14 +40,14 @@
 #include<gsl/gsl_rng.h> // GSL Random number generation
 #include<gsl/gsl_randist.h>  // GSL Random distributions
 
-#include "ErrorMC.h" //header file
+#include "ErrP.hpp" //header file
 
 //==============================================================================
 // Function Implementations
 //==============================================================================
 
 //default constructor (default parameters)
-ErrorMC::ErrorMC(){
+ErrP::ErrP(){
 
   //creating random number generator
 
@@ -63,7 +63,7 @@ ErrorMC::ErrorMC(){
 
 
 //Constructor (w/ parameters passed by the user)
-ErrorMC::ErrorMC(std::string user_method, unsigned long int user_seed){
+ErrP::ErrP(std::string user_method, unsigned long int user_seed){
 
   //creating random number generator
 
@@ -80,7 +80,7 @@ ErrorMC::ErrorMC(std::string user_method, unsigned long int user_seed){
 }
 
 //Constructor (w/ parameters passed by the user)
-ErrorMC::ErrorMC(std::string user_method, unsigned long int user_seed, int Nuser){
+ErrP::ErrP(std::string user_method, unsigned long int user_seed, int Nuser){
 
   //creating random number generator
 
@@ -98,12 +98,12 @@ ErrorMC::ErrorMC(std::string user_method, unsigned long int user_seed, int Nuser
 }
 
 //destructor
-ErrorMC::~ErrorMC(){
+ErrP::~ErrP(){
   // gsl_rng_free(r); // free memory associated to random number generator
   std::cout << "Releasing memory...\n";
 }
 
-void ErrorMC::SetParCentral(std::vector<double> user_info){
+void ErrP::SetParCentral(std::vector<double> user_info){
   par_central = user_info;
   Npar = par_central.size();
 
@@ -114,7 +114,7 @@ void ErrorMC::SetParCentral(std::vector<double> user_info){
   // } //working
 }
 
-void ErrorMC::SetParSigma(std::vector<double> user_info){
+void ErrP::SetParSigma(std::vector<double> user_info){
   par_sigma = user_info;
 
   // int Npar = par_sigma.size();
@@ -125,7 +125,7 @@ void ErrorMC::SetParSigma(std::vector<double> user_info){
 
 }
 
-void ErrorMC::SetParCov(gsl_matrix *user_matrix){
+void ErrP::SetParCov(gsl_matrix *user_matrix){
 
   if(Npar == 0){
     std::cout << "\nPlease, set parameter values first\n";
@@ -140,7 +140,7 @@ void ErrorMC::SetParCov(gsl_matrix *user_matrix){
 }
 
 
-void ErrorMC::SetParCov(const char *file_path){
+void ErrP::SetParCov(const char *file_path){
 
   if(Npar == 0){
     std::cout << "\nPlease, set parameter values first\n";
@@ -164,7 +164,7 @@ void ErrorMC::SetParCov(const char *file_path){
 }
 
 
-void ErrorMC::SetExtraPar(void *user_info){
+void ErrP::SetExtraPar(void *user_info){
 
   // std::cout << "Testing Extra parameter copy\n";
 
@@ -177,15 +177,15 @@ void ErrorMC::SetExtraPar(void *user_info){
   //working!!!
 }
 
-void ErrorMC::SetN(int Nuser){
+void ErrP::SetN(int Nuser){
   Nmax = Nuser;
 }
 
-void ErrorMC::SetSeed(unsigned long int seed_user){
+void ErrP::SetSeed(unsigned long int seed_user){
   seed = seed_user;
 }
 
-void ErrorMC::SetRandMethod(std::string user_method){
+void ErrP::SetRandMethod(std::string user_method){
 
   if(user_method.compare("default")==0){
     rng_type = gsl_rng_default;
@@ -211,7 +211,7 @@ void ErrorMC::SetRandMethod(std::string user_method){
   //add more ...
 
 }
-void ErrorMC::SetModel(funcmodel_t user_func){
+void ErrP::SetModel(funcmodel_t user_func){
   model = user_func;
 }
 
@@ -224,7 +224,7 @@ void ErrorMC::SetModel(funcmodel_t user_func){
   // std::cout << "Info " << *(float*)extra_par << "\n";
   // std::cout << "Yes!!\n"er generator (GSL) and vector to store result
 
-int ErrorMC::GenParMC
+int ErrP::GenParMC
 (
 // std::vector<double> par_central, std::vector<double> par_sigma,gsl_rng *r ,
  std::vector<double> &result)
@@ -262,7 +262,7 @@ int ErrorMC::GenParMC
   // std::cout << "Info " << *(float*)extra_par << "\n";
   // std::cout << "Yes!!\n"er generator (GSL) and vector to store result
 
-int ErrorMC::GenParMCCov
+int ErrP::GenParMCCov
 (
 // std::vector<double> par_central, std::vector<double> par_sigma,gsl_rng *r ,
  std::vector<double> &result)
@@ -306,12 +306,12 @@ int ErrorMC::GenParMCCov
 //maximum number of points to be calculated (user's choice).
 //It creats random number generator and performs MC to calculate
 //Returns: error, and mean value (by reference)
-// double ErrorMC::ErrorCalc
+// double ErrP::ErrorCalc
 // (double x, std::vector<double> par_central, std::vector<double> par_sigma,
 //  double(*model)(double,std::vector<double>,void*),
 //  // funcmodel_t model,
 //  void *extra_par, int Nmax, double &average)
-double ErrorMC::ErrorCalc
+double ErrP::ErrorCalc
 (double x,// std::vector<double> par_central, std::vector<double> par_sigma,
  // double(*model)(double,std::vector<double>,void*),
  // funcmodel_t model,
@@ -395,12 +395,12 @@ double ErrorMC::ErrorCalc
 //maximum number of points to be calculated (user's choice).
 //It creats random number generator and performs MC to calculate
 //Returns: error, and mean value (by reference)
-// double ErrorMC::ErrorCalc
+// double ErrP::ErrorCalc
 // (double x, std::vector<double> par_central, std::vector<double> par_sigma,
 //  double(*model)(double,std::vector<double>,void*),
 //  // funcmodel_t model,
 //  void *extra_par, int Nmax, double &average)
-double ErrorMC::ErrorCalcCov
+double ErrP::ErrorCalcCov
 (double x,// std::vector<double> par_central, std::vector<double> par_sigma,
  // double(*model)(double,std::vector<double>,void*),
  // funcmodel_t model,
