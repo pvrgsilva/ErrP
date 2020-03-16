@@ -97,49 +97,33 @@ public:
   void SetExtraPar(void *);
   void SetModel(funcmodel_t);
 
-//Parameter Generator
-  // int GenParMC(std::vector<double>,std::vector<double>,gsl_rng*,std::vector<double>&);
+//------------------------------- DERIVATIVES --------------------------------//
+
+
+//------------------------------- MONTE CARLO --------------------------------//
+//Parameter Generator (Monte Carlo)
   int GenParMC(std::vector<double>&);
 
-//Parameter Generator with Covariance
+//Parameter Generator (Monte Carlo) with Covariance
   int GenParMCCov(std::vector<double>&);
 
-  //Error Propagation Calculation
-  //Inputs: independent variable of the model (x)
-  //vectors with parameters central values and uncertainties,
-  //function with model and extra parameters (both defined by user),
-  //maximum number of points to be calculated (user's choice).
-  //It creats random number generator and performs MC to calculate
-  //Returns: error, and mean value (by reference)
-    double ErrorCalc
-    // (double,std::vector<double>,std::vector<double>,
-    // double(*)(double,std::vector<double>,void*),
-    // //funcmodel_t,
-    // void*,int,double&);
-    (double,
-     // double(*)(double,std::vector<double>,void*),
-     // funcmodel_t,
-     // int,
-     double&);
-
-
-//Error Propagation Calculation with Covariance
+//Error Propagation Calculation Monte Carlo
 //Inputs: independent variable of the model (x)
 //vectors with parameters central values and uncertainties,
 //function with model and extra parameters (both defined by user),
 //maximum number of points to be calculated (user's choice).
 //It creats random number generator and performs MC to calculate
 //Returns: error, and mean value (by reference)
-  double ErrorCalcCov
-  // (double,std::vector<double>,std::vector<double>,
-  // double(*)(double,std::vector<double>,void*),
-  // //funcmodel_t,
-  // void*,int,double&);
-  (double,
-   // double(*)(double,std::vector<double>,void*),
-   // funcmodel_t,
-   // int,
-   double&);
+  double ErrorCalcMC(double,double&);
+
+//Error Propagation Calculation with Monte Carlo with Covariance
+//Inputs: independent variable of the model (x)
+//vectors with parameters central values and uncertainties,
+//function with model and extra parameters (both defined by user),
+//maximum number of points to be calculated (user's choice).
+//It creats random number generator and performs MC to calculate
+//Returns: error, and mean value (by reference)
+  double ErrorCalcCovMC(double,double&);
 
 };
 //------------------------------------------------------------------------------
