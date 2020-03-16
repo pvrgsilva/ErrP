@@ -215,19 +215,15 @@ void ErrP::SetModel(funcmodel_t user_func){
   model = user_func;
 }
 
+//------------------------------- DERIVATIVES --------------------------------//
 
-//Parameter Generator
+
+//------------------------------- MONTE CARLO --------------------------------//
+
+//Parameter Generator (Monte Carlo)
 //Gaussian distribution
-//Inputs: vectors with parameters central values and uncertainties,
-// pointer to random numbn";
-  // std::cout << "Size: " << sizeof(extra_par) << "\n";
-  // std::cout << "Info " << *(float*)extra_par << "\n";
-  // std::cout << "Yes!!\n"er generator (GSL) and vector to store result
-
-int ErrP::GenParMC
-(
-// std::vector<double> par_central, std::vector<double> par_sigma,gsl_rng *r ,
- std::vector<double> &result)
+//Returns parameters in vector passed as argument
+int ErrP::GenParMC(std::vector<double> &result)
 {
   // int npar = par_central.size();
   int npar_sigma = par_sigma.size();
@@ -254,18 +250,10 @@ int ErrP::GenParMC
 
 
 
-//Parameter Generator with Covariance
+//Parameter Generator (Monte Carlo) with Covariance
 //Gaussian distribution
-//Inputs: vectors with parameters central values and uncertainties,
-// pointer to random numbn";
-  // std::cout << "Size: " << sizeof(extra_par) << "\n";
-  // std::cout << "Info " << *(float*)extra_par << "\n";
-  // std::cout << "Yes!!\n"er generator (GSL) and vector to store result
-
-int ErrP::GenParMCCov
-(
-// std::vector<double> par_central, std::vector<double> par_sigma,gsl_rng *r ,
- std::vector<double> &result)
+//Returns parameters in vector passed as argument
+int ErrP::GenParMCCov(std::vector<double> &result)
 {
   // int npar = par_central.size();
   int npar_sigma = par_sigma.size();
@@ -299,7 +287,7 @@ int ErrP::GenParMCCov
 
 
 //------------------------------------------------------------------------------
-//Error Propagation Calculation
+//Error Propagation Calculation with Monte Carlo
 //Inputs: independent variable of the model (x)
 //vectors with parameters central values and uncertainties,
 //function with model and extra parameters (both defined by user),
@@ -311,13 +299,7 @@ int ErrP::GenParMCCov
 //  double(*model)(double,std::vector<double>,void*),
 //  // funcmodel_t model,
 //  void *extra_par, int Nmax, double &average)
-double ErrP::ErrorCalc
-(double x,// std::vector<double> par_central, std::vector<double> par_sigma,
- // double(*model)(double,std::vector<double>,void*),
- // funcmodel_t model,
- //void *extra_par,
- // int Nmax,
- double &average)
+double ErrP::ErrorCalcMC(double x,double &average)
 {
 
   // //creating random number generator
@@ -382,10 +364,10 @@ double ErrP::ErrorCalc
 
   return sdev;
 }
-//end of function ErrorCalc
+//end of function ErrorCalcMC
 
 //------------------------------------------------------------------------------
-//Error Propagation Calculation with Covariance
+//Error Propagation Calculation with Monte Carlo with Covariance
 //****Working. Error still larger than from analytical calculations,
 // but still smaller than without covariance. Check method!!
 //
@@ -400,13 +382,7 @@ double ErrP::ErrorCalc
 //  double(*model)(double,std::vector<double>,void*),
 //  // funcmodel_t model,
 //  void *extra_par, int Nmax, double &average)
-double ErrP::ErrorCalcCov
-(double x,// std::vector<double> par_central, std::vector<double> par_sigma,
- // double(*model)(double,std::vector<double>,void*),
- // funcmodel_t model,
- //void *extra_par,
- // int Nmax,
- double &average)
+double ErrP::ErrorCalcCovMC(double x,double &average)
 {
 
   // //creating random number generator
@@ -471,4 +447,4 @@ double ErrP::ErrorCalcCov
 
   return sdev;
 }
-//end of function ErrorCalcCov
+//end of function ErrorCalcCovMC
