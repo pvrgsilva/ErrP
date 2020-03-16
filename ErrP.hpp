@@ -1,7 +1,7 @@
 /*
 ================================================================================
-   ErrorMC
-   A Monte Carlo Error Propagation
+   ErrP
+   A Class for (Numerical) Error Propagation
 ================================================================================
 
    *** Header file ***
@@ -34,8 +34,8 @@
 */
 
 
-#ifndef ERRORMC_H
-#define ERRORMC_H
+#ifndef ERRP_H
+#define ERRP_H
 
 #include<iostream>
 #include<cstdio>
@@ -52,18 +52,18 @@
 #include<gsl/gsl_randist.h>  // GSL Random distributions
 #include<gsl/gsl_statistics_double.h> // for tests
 
-//#include "ErrorMCdef.h" //file with functions implementations
+//#include "ErrPdef.h" //file with functions implementations
 
 
 typedef double (*funcmodel_t) (double,std::vector<double>,void*);
 
-//#include "ErrorMC.cpp" //file with functions implementations
+//#include "ErrP.cpp" //file with functions implementations
 
 //=============================================================================
 // Class declaration
 //=============================================================================
 
-class ErrorMC {
+class ErrP {
 // private:
   std::vector<double> par_central;
   std::vector<double> par_sigma;
@@ -81,10 +81,10 @@ class ErrorMC {
 public:
   double average;
 
-  ErrorMC(); //constructor (create others?)
-  ErrorMC(std::string, unsigned long int); //constructor 2
-  ErrorMC(std::string, unsigned long int, int); //constructor 3
-  ~ErrorMC(); //destructor
+  ErrP(); //constructor (create others?)
+  ErrP(std::string, unsigned long int); //constructor 2
+  ErrP(std::string, unsigned long int, int); //constructor 3
+  ~ErrP(); //destructor
   void SetModel();
   void SetN(int);
   void SetSeed(unsigned long int);
