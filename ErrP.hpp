@@ -98,7 +98,10 @@ public:
   void SetModel(funcmodel_t);
 
 //------------------------------- DERIVATIVES --------------------------------//
-
+//Gradient of function model
+//Inputs: independent variable of the model
+//        and vector to store gradient components
+  int CalcGrad(double,std::vector<double>&);
 
 //------------------------------- MONTE CARLO --------------------------------//
 //Parameter Generator (Monte Carlo)
