@@ -78,7 +78,10 @@ private:
   gsl_matrix *covmatrix;
   gsl_matrix *covmatrix_fc; //after Cholesky decomposition (used only for MC)
   const gsl_rng_type *rng_type;
-
+  bool statepar; // if parameters were informed
+  bool statesig; // if sigma of parameters were informed
+  bool statecov; // if cov matrix was informed
+  bool statefunc; // if function model was informed
   // string rand_method;
 public:
   double average;
@@ -98,6 +101,7 @@ public:
   void SetParCov(const char *);
   void SetExtraPar(void *);
   void SetModel(funcmodel_t);
+  void UseCovariance(bool);
 
 //------------------------------- DERIVATIVES --------------------------------//
 //Gradient of function model
