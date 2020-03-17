@@ -282,19 +282,29 @@ int ErrP::CalcGrad(double x,std::vector<double> &grad){
 
 double ErrP::ErrorCalcGrad(double x){
 
+  gsl_matrix cov_aux = gsl_matrix_alloc(Npar,Npar);
+
   if(statefunc==false){
     std::cout << "Function model not informed\n";
     return -1;
   }else if(statepar==false){
     std::cout << "Parameters not informed\n";
     return -1;
-  }else
+  }else if(statesig==false && statecov==false){
+    std::cout << "Uncertainties and covariance matrix not informed\n";
+  }else if(statesig==true && statecov==false){
+    std::cout << "Error propagation without covariance\n";
+    gsl_matrix_set_zero(cov_aux);
+    double error;
+    for(int i=0;i<Npar;i++){
+      error = par_sigma.at(i);
+      gsl_matrix_set(cov_aux,error*error,i);
+    }
+  }else// if(statesig==false && statecov==true){
+    {
 
-//
-
-
-
-  {
+    std::cout << "Error propagation with covariance\n";
+    gsl_matrix_memcpy(cov_aux,covmatrix);
 
     std::vector<double> grad_aux;
     int state = CalcGrad(x,grad_aux);
@@ -310,7 +320,7 @@ double ErrP::ErrorCalcGrad(double x){
       gsl_vector *prodSigmaGrad = gsl_vector_alloc(Npar);
 
 //do product CovMatrix*Grad(model) = vec(v)
-      gsl_blas_dsymv(CblasLower,1,covmatrix,grad,0,prodSigmaGrad);
+      gsl_blas_dsymv(CblasLower,1,cov_aux,grad,0,prodSigmaGrad);
 
 
       double result=0;
@@ -323,6 +333,7 @@ double ErrP::ErrorCalcGrad(double x){
       grad_aux.clear();
       gsl_vector_free(grad);
       gsl_vector_free(prodSigmaGrad);
+      gsl_matrix_free(cov_aux);
       return error;
     }
 }
