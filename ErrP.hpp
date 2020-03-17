@@ -1,4 +1,4 @@
-/*
+/*!
 ================================================================================
    ErrP
    A Class for (Numerical) Error Propagation
@@ -65,7 +65,7 @@ typedef double (*funcmodel_t) (double,std::vector<double>,void*);
 //=============================================================================
 
 class ErrP {
-// private:
+private:
   std::vector<double> par_central;
   std::vector<double> par_sigma;
   // std::vector<double> result;
@@ -75,8 +75,8 @@ class ErrP {
   int Npar;
   unsigned long int seed;
   gsl_rng *r;
-  gsl_matrix *covmatrix; //new
-  gsl_matrix *covmatrix_fc; //after Cholesky factorization (used only for MC)
+  gsl_matrix *covmatrix;
+  gsl_matrix *covmatrix_fc; //after Cholesky decomposition (used only for MC)
   const gsl_rng_type *rng_type;
 
   // string rand_method;
