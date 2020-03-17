@@ -49,6 +49,11 @@
 //default constructor (default parameters)
 ErrP::ErrP(){
 
+  statepar=false;
+  statesig=false;
+  statecov=false;
+  statefunc=false;
+
   //creating random number generator
 
   seed = 0; //seed
@@ -64,6 +69,11 @@ ErrP::ErrP(){
 
 //Constructor (w/ parameters passed by the user)
 ErrP::ErrP(std::string user_method, unsigned long int user_seed){
+
+  statepar=false;
+  statesig=false;
+  statecov=false;
+  statefunc=false;
 
   //creating random number generator
 
@@ -81,6 +91,11 @@ ErrP::ErrP(std::string user_method, unsigned long int user_seed){
 
 //Constructor (w/ parameters passed by the user)
 ErrP::ErrP(std::string user_method, unsigned long int user_seed, int Nuser){
+
+  statepar=false;
+  statesig=false;
+  statecov=false;
+  statefunc=false;
 
   //creating random number generator
 
@@ -107,6 +122,8 @@ void ErrP::SetParCentral(std::vector<double> user_info){
   par_central = user_info;
   Npar = par_central.size();
 
+  statepar=true;
+
   // int Npar = par_central.size();
   // std::cout << "Testing passing parameters\n";
   // for(int i = 0;i<Npar;i++){
@@ -117,6 +134,7 @@ void ErrP::SetParCentral(std::vector<double> user_info){
 void ErrP::SetParSigma(std::vector<double> user_info){
   par_sigma = user_info;
 
+  statesig=true;
   // int Npar = par_sigma.size();
   // std::cout << "Testing passing parameter errors\n";
   // for(int i = 0;i<Npar;i++){
@@ -139,6 +157,7 @@ void ErrP::SetParCov(gsl_matrix *user_matrix){
     gsl_linalg_cholesky_decomp1(covmatrix_fc);
   }
 
+  statecov==true;
 }
 
 
@@ -163,7 +182,7 @@ void ErrP::SetParCov(const char *file_path){
   }
 
 
-
+  statecov=true;
 
 }
 
@@ -215,8 +234,17 @@ void ErrP::SetRandMethod(std::string user_method){
   //add more ...
 
 }
+
 void ErrP::SetModel(funcmodel_t user_func){
   model = user_func;
+  statefunc = true;
+}
+
+
+void ErrP::UseCovariance(bool info_user){
+  statecov = info_user;
+
+  std::cout << "Use cov matrix is set to " << statecov << "\n";
 }
 
 //------------------------------- DERIVATIVES --------------------------------//
@@ -225,6 +253,11 @@ void ErrP::SetModel(funcmodel_t user_func){
 //        and vector to store gradient components
 int ErrP::CalcGrad(double x,std::vector<double> &grad){
 
+
+  // if(statefunc==false){
+    // std::cout << "Function model not informed\n";
+    // return -1;
+  // }else{
   double eps = 10e-8;
 
   // std::vector<double> par_aux = par_central;
@@ -241,6 +274,7 @@ int ErrP::CalcGrad(double x,std::vector<double> &grad){
   }
 
   par_deriv.clear();
+// }
 
   return 0;
 
@@ -248,32 +282,52 @@ int ErrP::CalcGrad(double x,std::vector<double> &grad){
 
 double ErrP::ErrorCalcGrad(double x){
 
-  std::vector<double> grad_aux;
-  CalcGrad(x,grad_aux);
+  if(statefunc==false){
+    std::cout << "Function model not informed\n";
+    return -1;
+  }else if(statepar==false){
+    std::cout << "Parameters not informed\n";
+    return -1;
+  }else
 
-  gsl_vector *grad = gsl_vector_alloc(Npar);
-  for(int i=0;i<Npar;i++){
-    gsl_vector_set(grad,i,grad_aux.at(i));
-  }
+//
 
-  gsl_vector *prodSigmaGrad = gsl_vector_alloc(Npar);
+
+
+  {
+
+    std::vector<double> grad_aux;
+    int state = CalcGrad(x,grad_aux);
+
+    if(state!=0){
+      std::cout << "Gradient not calculated\n";
+      return 0;
+    }else{
+      gsl_vector *grad = gsl_vector_alloc(Npar);
+      for(int i=0;i<Npar;i++){
+        gsl_vector_set(grad,i,grad_aux.at(i));
+      }
+      gsl_vector *prodSigmaGrad = gsl_vector_alloc(Npar);
 
 //do product CovMatrix*Grad(model) = vec(v)
-  gsl_blas_dsymv(CblasLower,1,covmatrix,grad,0,prodSigmaGrad);
+      gsl_blas_dsymv(CblasLower,1,covmatrix,grad,0,prodSigmaGrad);
 
 
-  double result=0;
+      double result=0;
 
 //do product Transpose(Grad(model))*vec(v)
-  gsl_blas_ddot(grad,prodSigmaGrad,&result);
+      gsl_blas_ddot(grad,prodSigmaGrad,&result);
 
-  double error = sqrt(result);
+      double error = sqrt(result);
 
-  grad_aux.clear();
-  gsl_vector_free(grad);
-  gsl_vector_free(prodSigmaGrad);
+      grad_aux.clear();
+      gsl_vector_free(grad);
+      gsl_vector_free(prodSigmaGrad);
+      return error;
+    }
+}
 
-  return error;
+
 }
 
 
@@ -289,10 +343,19 @@ int ErrP::GenParMC(std::vector<double> &result)
   int npar_sigma = par_sigma.size();
 
   if(Npar != npar_sigma){
-    std::cout << "Parameters and Sigma must have same number of entries.\n";
+    std::cout << "Parameters and Sigma must have same number of entries\n";
     return -1;
-  }
-
+  }else if(statesig==false){
+    std::cout << "Sigma not informed\n";
+    return -1;
+  }//else if(statepar==false){
+  //   std::cout << "Parameters not informed\n";
+  //   return -1;
+  // }else if(statefunc==false){
+  //   std::cout << "Function model not informed\n";
+  //   return -1;
+  // }
+  else{
 
   for(int i=0; i<Npar;i++){
     if(par_sigma.at(i)!=0){
@@ -304,6 +367,7 @@ int ErrP::GenParMC(std::vector<double> &result)
   }
 
   return 0;
+}
 
 }
 //end of function GenParMC
@@ -321,7 +385,10 @@ int ErrP::GenParMCCov(std::vector<double> &result)
   if(Npar != npar_sigma){
     std::cout << "Parameters and Sigma must have same number of entries.\n";
     return -1;
-  }
+  }else if(statecov==false){
+    std::cout << "Covariance Matrix not informed\n";
+    return -1;
+  }else{
 
 
   gsl_vector *res_aux = gsl_vector_alloc(Npar);
@@ -341,6 +408,7 @@ int ErrP::GenParMCCov(std::vector<double> &result)
   gsl_vector_free(mu);
 
   return 0;
+}
 
 }
 //end of function GenParMCCov
@@ -361,45 +429,56 @@ int ErrP::GenParMCCov(std::vector<double> &result)
 //  void *extra_par, int Nmax, double &average)
 double ErrP::ErrorCalcMC(double x,double &average)
 {
-
-  // //creating random number generator
-  // //(for now, using default parameters)
-  //
-  // unsigned long int seed = 0; //seed
-  //
-  // const gsl_rng_type *T = gsl_rng_default;
-  // gsl_rng *r = gsl_rng_alloc(T);
-  // gsl_rng_set(r,seed);
-
   std::vector<double> Ymc, parmc;
   double y; int status;
 
+  if(statefunc==false){
+    std::cout << "Function model not informed\n";
+    return -1;
+  }else if(statepar==false){
+    std::cout << "Parameters not informed\n";
+    return -1;
+  }else{
+    if(statecov==false){
+      std::cout << "Calculating without covariance matrix\n";
 // loop for calculations
-  for(int i=0;i<Nmax;++i){
-    status = GenParMC(parmc);//(par_central,par_sigma,r,parmc);
-    if(status==-1) continue; //-1 means error, and should skip lines below
-    y = model(x,parmc,extra_par);//
-    Ymc.push_back(y);
-    parmc.clear();
-  }
+      for(int i=0;i<Nmax;++i){
+        status = GenParMC(parmc);//(par_central,par_sigma,r,parmc);
+        if(status!=0) continue; //-1 means error, and should skip lines below
+        y = model(x,parmc,extra_par);//
+        Ymc.push_back(y);
+        parmc.clear();
+      }
+    }
+    if(statecov==true){
+      std::cout << "Calculating with covariance matrix\n";
+  // loop for calculations
+      for(int i=0;i<Nmax;++i){
+        status = GenParMCCov(parmc);//(par_central,par_sigma,r,parmc);
+        if(status!=0) continue; //-1 means error, and should skip lines below
+        y = model(x,parmc,extra_par);//
+        Ymc.push_back(y);
+        parmc.clear();
+      }
+    }
 
   //mean value and standard deviation
 
-  double sdev = 0;
-  double sum1 = 0;
-  double sum2 = 0;
+    double sdev = 0;
+    double sum1 = 0;
+    double sum2 = 0;
 
-  int Ndata = Ymc.size();
+    int Ndata = Ymc.size();
 
 //mean
 
-  for(int i=0;i<Ndata;++i){
-    y = Ymc.at(i);
-    sum1 = sum1+y;
+    for(int i=0;i<Ndata;++i){
+      y = Ymc.at(i);
+      sum1 = sum1+y;
     // sum2 = sum2 + y*y;
-  }
+    }
 
-  average = sum1/Ndata;
+    average = sum1/Ndata;
 
   // const double *aux = &Ymc[0];
   // average = gsl_stats_mean(aux,1,Ndata);
@@ -407,26 +486,28 @@ double ErrP::ErrorCalcMC(double x,double &average)
 // standard deviation
 
 
-  double Delta = 0;//abs(sum2 - sum1*sum1);
+    double Delta = 0;//abs(sum2 - sum1*sum1);
 
-  for(int i=0;i<Ndata;++i){
-    Delta = Ymc.at(i)-average;
-    sum2 = sum2 + Delta*Delta;
-  }
+    for(int i=0;i<Ndata;++i){
+      Delta = Ymc.at(i)-average;
+      sum2 = sum2 + Delta*Delta;
+    }
 
-  sdev = sqrt(sum2/(Ndata-1.0));
+    sdev = sqrt(sum2/(Ndata-1.0));
 
   // sdev = gsl_stats_sd_m(aux,1,Ndata,average);
 
   // gsl_rng_free(r); // free memory associated to random number generator
-  Ymc.clear();
-  parmc.clear();
+    Ymc.clear();
+    parmc.clear();
 
-  return sdev;
+    return sdev;
+}
 }
 //end of function ErrorCalcMC
 
 //------------------------------------------------------------------------------
+//ATTENTION: With boolean flags, this function is not necessary.
 //Error Propagation Calculation with Monte Carlo with Covariance
 //****Working. Error still larger than from analytical calculations,
 // but still smaller than without covariance. Check method!!
