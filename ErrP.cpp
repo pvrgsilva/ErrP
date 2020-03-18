@@ -143,10 +143,12 @@ void ErrP::SetParSigma(std::vector<double> user_info){
 
 }
 
-void ErrP::SetParCov(gsl_matrix *user_matrix){
+int ErrP::SetParCov(gsl_matrix *user_matrix){
 
-  if(Npar == 0){
+  // if(Npar == 0){
+  if(statepar==false){
     std::cout << "\nPlease, set parameter values first\n";
+    return -1;
   }else{
     covmatrix = gsl_matrix_alloc(Npar,Npar);
     gsl_matrix_memcpy(covmatrix, user_matrix);
@@ -155,16 +157,19 @@ void ErrP::SetParCov(gsl_matrix *user_matrix){
     covmatrix_fc = gsl_matrix_alloc(Npar,Npar);
     gsl_matrix_memcpy(covmatrix_fc, covmatrix);
     gsl_linalg_cholesky_decomp1(covmatrix_fc);
+    statecov==true;
+    return 0;
   }
 
-  statecov==true;
 }
 
 
-void ErrP::SetParCov(const char *file_path){
+int ErrP::SetParCov(const char *file_path){
 
-  if(Npar == 0){
+  // if(Npar == 0){
+  if(statepar==false){
     std::cout << "\nPlease, set parameter values first\n";
+    return -1;
   }else{
     covmatrix = gsl_matrix_alloc(Npar,Npar);
     FILE *mfile = fopen(file_path,"r");
@@ -179,10 +184,11 @@ void ErrP::SetParCov(const char *file_path){
     covmatrix_fc = gsl_matrix_alloc(Npar,Npar);
     gsl_matrix_memcpy(covmatrix_fc, covmatrix);
     gsl_linalg_cholesky_decomp1(covmatrix_fc);
+    statecov=true;
+    return 0;
   }
 
 
-  statecov=true;
 
 }
 
@@ -280,9 +286,10 @@ int ErrP::CalcGrad(double x,std::vector<double> &grad){
 
 }
 
+//Needs new tests!!
 double ErrP::ErrorCalcGrad(double x){
 
-  gsl_matrix cov_aux = gsl_matrix_alloc(Npar,Npar);
+  gsl_matrix *cov_aux = gsl_matrix_alloc(Npar,Npar);
 
   if(statefunc==false){
     std::cout << "Function model not informed\n";
@@ -292,20 +299,26 @@ double ErrP::ErrorCalcGrad(double x){
     return -1;
   }else if(statesig==false && statecov==false){
     std::cout << "Uncertainties and covariance matrix not informed\n";
-  }else if(statesig==true && statecov==false){
+    return -1;
+  }else{
+
+    if(statesig==true && statecov==false){
     std::cout << "Error propagation without covariance\n";
-    gsl_matrix_set_zero(cov_aux);
-    double error;
+    // gsl_matrix_set_zero(cov_aux);
+    double error_par=0;
     for(int i=0;i<Npar;i++){
-      error = par_sigma.at(i);
-      gsl_matrix_set(cov_aux,error*error,i);
+      error_par = par_sigma.at(i);
+      for(int j=0;j<Npar;j++){
+        if(i==j) {gsl_matrix_set(cov_aux,i,j,error_par*error_par);}
+        else {gsl_matrix_set(cov_aux,i,j,0);}
+      }
     }
   }else// if(statesig==false && statecov==true){
     {
 
     std::cout << "Error propagation with covariance\n";
     gsl_matrix_memcpy(cov_aux,covmatrix);
-
+  }
     std::vector<double> grad_aux;
     int state = CalcGrad(x,grad_aux);
 
@@ -320,8 +333,8 @@ double ErrP::ErrorCalcGrad(double x){
       gsl_vector *prodSigmaGrad = gsl_vector_alloc(Npar);
 
 //do product CovMatrix*Grad(model) = vec(v)
-      gsl_blas_dsymv(CblasLower,1,cov_aux,grad,0,prodSigmaGrad);
-
+      // gsl_blas_dsymv(CblasUpper,1,cov_aux,grad,0,prodSigmaGrad);
+      gsl_blas_dgemv(CblasNoTrans,1,cov_aux,grad,0,prodSigmaGrad);
 
       double result=0;
 
