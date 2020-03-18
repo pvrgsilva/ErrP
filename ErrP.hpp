@@ -97,8 +97,8 @@ public:
   void SetRandMethod(std::string);
   void SetParCentral(std::vector<double>);
   void SetParSigma(std::vector<double>);
-  void SetParCov(gsl_matrix *); //to be implemented
-  void SetParCov(const char *);
+  int SetParCov(gsl_matrix *);
+  int SetParCov(const char *);
   void SetExtraPar(void *);
   void SetModel(funcmodel_t);
   void UseCovariance(bool);
