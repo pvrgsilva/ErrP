@@ -206,6 +206,7 @@ void ErrP::SetExtraPar(void *user_info){
   //working!!!
 }
 
+
 void ErrP::SetN(int Nuser){
   Nmax = Nuser;
 }
@@ -251,6 +252,18 @@ void ErrP::UseCovariance(bool info_user){
   statecov = info_user;
 
   std::cout << "Use cov matrix is set to " << statecov << "\n";
+}
+
+
+double ErrP::CalcModel(double x){
+
+  if(statefunc==false){
+    std::cout << "Function model not informed\n";
+    return -1;
+  }else{
+    return model(x,par_central,extra_par);
+  }
+
 }
 
 //------------------------------- DERIVATIVES --------------------------------//
