@@ -317,14 +317,11 @@ double ErrP::ErrorCalcGrad(double x){
 
     if(statesig==true && statecov==false){
     std::cout << "Error propagation without covariance\n";
-    // gsl_matrix_set_zero(cov_aux);
+    gsl_matrix_set_zero(cov_aux);
     double error_par=0;
     for(int i=0;i<Npar;i++){
       error_par = par_sigma.at(i);
-      for(int j=0;j<Npar;j++){
-        if(i==j) {gsl_matrix_set(cov_aux,i,j,error_par*error_par);}
-        else {gsl_matrix_set(cov_aux,i,j,0);}
-      }
+      gsl_matrix_set(cov_aux,i,i,error_par*error_par);
     }
   }else// if(statesig==false && statecov==true){
     {
@@ -346,8 +343,8 @@ double ErrP::ErrorCalcGrad(double x){
       gsl_vector *prodSigmaGrad = gsl_vector_alloc(Npar);
 
 //do product CovMatrix*Grad(model) = vec(v)
-      // gsl_blas_dsymv(CblasUpper,1,cov_aux,grad,0,prodSigmaGrad);
-      gsl_blas_dgemv(CblasNoTrans,1,cov_aux,grad,0,prodSigmaGrad);
+      gsl_blas_dsymv(CblasUpper,1,cov_aux,grad,0,prodSigmaGrad);
+      // gsl_blas_dgemv(CblasNoTrans,1,cov_aux,grad,0,prodSigmaGrad);
 
       double result=0;
 
