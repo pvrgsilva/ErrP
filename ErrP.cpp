@@ -390,6 +390,7 @@ int ErrP::GenParMC(std::vector<double> &result)
   //   return -1;
   // }
   else{
+    // gsl_rng_set(r,seed); //to be sure that the user seed is being used
 
   for(int i=0; i<Npar;i++){
     if(par_sigma.at(i)!=0){
@@ -424,7 +425,7 @@ int ErrP::GenParMCCov(std::vector<double> &result)
     return -1;
   }else{
 
-
+  // gsl_rng_set(r,seed); //to be sure that the user seed is being used
   gsl_vector *res_aux = gsl_vector_alloc(Npar);
   gsl_vector *mu = gsl_vector_alloc(Npar);
 
@@ -463,6 +464,7 @@ int ErrP::GenParMCCov(std::vector<double> &result)
 //  void *extra_par, int Nmax, double &average)
 double ErrP::ErrorCalcMC(double x,double &average)
 {
+  gsl_rng_set(r,seed); //to be sure that the user seed is being used
   std::vector<double> Ymc, parmc;
   double y; int status;
 
