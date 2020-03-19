@@ -522,14 +522,15 @@ double ErrP::ErrorCalcMC(double x,double &average)
 // standard deviation
 
 
-    double Delta = 0;//abs(sum2 - sum1*sum1);
+    double Delta = 0;
 
     for(int i=0;i<Ndata;++i){
-      Delta = Ymc.at(i)-average;
+      y = Ymc.at(i);
+      Delta = y-average;
       sum2 = sum2 + Delta*Delta;
     }
 
-    sdev = sqrt(sum2/(Ndata-1.0));
+    sdev = sqrt(sum2/(Ndata-1));
 
   // sdev = gsl_stats_sd_m(aux,1,Ndata,average);
 
