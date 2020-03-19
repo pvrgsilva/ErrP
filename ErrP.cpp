@@ -31,14 +31,14 @@
 
 */
 
-#include<iostream>
-#include<cstdio>
-#include<vector>
-#include<cmath>
+// #include<iostream>
+// #include<cstdio>
+// #include<vector>
+// #include<cmath>
 
 // //GSL Libraries
-#include<gsl/gsl_rng.h> // GSL Random number generation
-#include<gsl/gsl_randist.h>  // GSL Random distributions
+// #include<gsl/gsl_rng.h> // GSL Random number generation
+// #include<gsl/gsl_randist.h>  // GSL Random distributions
 
 #include "ErrP.hpp" //header file
 
