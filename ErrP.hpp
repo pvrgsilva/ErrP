@@ -103,6 +103,8 @@ public:
   void SetModel(funcmodel_t);
   void UseCovariance(bool);
 
+  double CalcModel(double);
+
 //------------------------------- DERIVATIVES --------------------------------//
 //Gradient of function model
 //Inputs: independent variable of the model
