@@ -157,7 +157,7 @@ int ErrP::SetParCov(gsl_matrix *user_matrix){
     covmatrix_fc = gsl_matrix_alloc(Npar,Npar);
     gsl_matrix_memcpy(covmatrix_fc, covmatrix);
     gsl_linalg_cholesky_decomp1(covmatrix_fc);
-    statecov==true;
+    statecov=true;
     return 0;
   }
 
@@ -485,7 +485,7 @@ double ErrP::ErrorCalcMC(double x,double &average)
         Ymc.push_back(y);
         parmc.clear();
       }
-    }
+    }else {
     if(statecov==true){
       std::cout << "Calculating with covariance matrix\n";
   // loop for calculations
@@ -497,6 +497,7 @@ double ErrP::ErrorCalcMC(double x,double &average)
         parmc.clear();
       }
     }
+  }
 
   //mean value and standard deviation
 
