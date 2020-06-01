@@ -1,5 +1,6 @@
 # ErrP class definition
 
+import numpy as np #functions need numpy module
 
 class ErrP:
     
@@ -51,7 +52,7 @@ class ErrP:
         
     def __str__(self):
         """Conversion to string."""
-        text = """Model {} 
+        text = """Model {}
 Function defined: {}
 Parameters informed: {}
 Uncertainties informed: {}
@@ -72,12 +73,17 @@ Using Covariance: {}""".format(self.name,self.funcstatus,self.parstatus,self.unc
         """Set model function"""
         self.funcmodel = func_model
         
+    def setParameters(self,user_par):
+        self.params = user_par
+        self.parstatus = True
+    
     def evalModel(self,x):
         """Evaluates the model passed by the user with given parameters for x"""
         model = self.funcmodel
         par = self.params
-        if self.parstatus == True: #not enough to solve the problem
-            return model(x,par)
-        else:
-            return model(x)
+        #function expect parameters
+        #if self.parstatus == True: #not enough to solve the problem
+        return model(x,par)
+        #else:
+         #   return model(x)
     
