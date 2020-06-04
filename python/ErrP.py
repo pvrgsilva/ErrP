@@ -77,6 +77,23 @@ Using Covariance: {}""".format(self.name,self.funcstatus,self.parstatus,self.unc
         self.params = user_par
         self.parstatus = True
     
+    def SetCovMatrix(self,user_matrix):
+        """Set covariance matrix.
+        User matrix can be a file path or a matrix (numpy array) itself"""
+        
+        if(type(user_matrix)==str):
+#            print('reading matrix from file')
+            self.covmatrix = np.loadtxt(user_matrix)
+        else:
+#            print('matrix passed by the user')
+            self.covmatrix = user_matrix
+        
+        self.covstatus = True
+        self.usecov = True
+        
+            
+        
+    
     def CalcModel(self,x):
         """Evaluates the model passed by the user with given parameters for x"""
         model = self.model
@@ -112,7 +129,7 @@ Using Covariance: {}""".format(self.name,self.funcstatus,self.parstatus,self.unc
             
         return grad       
         
-    #def evalGradError(self,x) #calculate error prop with derivatives
+    #def CalcErrorGrad(self,x) #calculate error prop with derivatives
     #def genParams(self,x)   # generate normal distributed parameters
     #def evalMCError(self,x) # evaluate error prop with MC
     
