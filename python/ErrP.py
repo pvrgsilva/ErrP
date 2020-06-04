@@ -119,15 +119,16 @@ Using Covariance: {}""".format(self.name,self.funcstatus,self.parstatus,self.unc
             print('Central parameters not informed')
             return None
         
-        grad=[]
+        npar = len(self.params)
+        grad = [] #np.empty((npar))
         par_central = self.params[:] # copy of central parameters
         par_aux = self.params[:]
         eps = 1.0e-8
         model = self.model
         
-        for i in range(len(self.params)):
-            par_aux[i] += eps
-            delta = self.model(x,par_aux) - model(x,par_central)
+        for i in range(npar):
+            par_aux[i] = par_aux[i] + eps
+            delta = model(x,par_aux) - model(x,par_central)
             grad.append(delta/eps)
             par_aux[i] = par_central[i]
             
