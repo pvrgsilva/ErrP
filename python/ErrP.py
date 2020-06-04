@@ -15,7 +15,7 @@ class ErrP:
         self.params = params        # model parameters
         self.parunc = parunc        # model parameters uncertainties
         self.covmarix = covmatrix   # covariance matrix
-        self.funcmodel = func_model # model function
+        self.model = func_model # model function
         
         
         #status variables
@@ -60,30 +60,59 @@ Cov matrix informed: {}
 Using Covariance: {}""".format(self.name,self.funcstatus,self.parstatus,self.uncstatus,self.covstatus,self.usecov)
         return text
     
-    def setModelName(self,name):
+    def SetModelName(self,name):
         """Set model name"""
         
         self.name=name
         
-    def useCovMatrix(option=False):
+    def UseCovMatrix(self,option=False):
         """Set if user wants to use covariance matrix"""
         self.usecov = option
         
-    def setModel(self,func_model):
+    def SetModel(self,func_model):
         """Set model function"""
-        self.funcmodel = func_model
+        self.model = func_model
         
-    def setParameters(self,user_par):
+    def SetParameters(self,user_par):
         self.params = user_par
         self.parstatus = True
     
-    def evalModel(self,x):
+    def CalcModel(self,x):
         """Evaluates the model passed by the user with given parameters for x"""
-        model = self.funcmodel
+        model = self.model
         par = self.params
         #function expect parameters
         #if self.parstatus == True: #not enough to solve the problem
         return model(x,par)
         #else:
          #   return model(x)
+    
+    def CalcGrad(self,x): #calculate gradient
+        """ Evaluates the Gradient of Model """
+        
+        if self.funcstatus == False:
+            print('Function model not informed')
+            return None
+        
+        if self.parstatus == False:
+            print('Central parameters not informed')
+            return None
+        
+        grad=[]
+        par_central = self.params[:] # copy of central parameters
+        par_aux = self.params[:]
+        eps = 1.0e-8
+        model = self.model
+        
+        for i in range(len(self.params)):
+            par_aux[i] += eps
+            delta = self.model(x,par_aux) - model(x,par_central)
+            grad.append(delta/eps)
+            par_aux[i] = par_central[i]
+            
+        return grad       
+        
+    #def evalGradError(self,x) #calculate error prop with derivatives
+    #def genParams(self,x)   # generate normal distributed parameters
+    #def evalMCError(self,x) # evaluate error prop with MC
     
