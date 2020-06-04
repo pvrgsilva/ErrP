@@ -77,6 +77,11 @@ Using Covariance: {}""".format(self.name,self.funcstatus,self.parstatus,self.unc
         self.params = user_par
         self.parstatus = True
     
+    def SetParErrors(self,user_errors):
+        """Set parameters uncertantines"""
+        self.parunc = user_errors
+        self.uncstatus = True
+    
     def SetCovMatrix(self,user_matrix):
         """Set covariance matrix.
         User matrix can be a file path or a matrix (numpy array) itself"""
@@ -91,8 +96,7 @@ Using Covariance: {}""".format(self.name,self.funcstatus,self.parstatus,self.unc
         self.covstatus = True
         self.usecov = True
         
-            
-        
+                   
     
     def CalcModel(self,x):
         """Evaluates the model passed by the user with given parameters for x"""
@@ -129,7 +133,50 @@ Using Covariance: {}""".format(self.name,self.funcstatus,self.parstatus,self.unc
             
         return grad       
         
-    #def CalcErrorGrad(self,x) #calculate error prop with derivatives
+    def CalcErrorGrad(self,x): #calculate error prop with derivatives
+        
+        if self.funcstatus == False:
+            print('Function model not informed')
+            return None
+        elif self.parstatus == False:
+            print('Parameters not informed')
+            return None
+        elif self.uncstatus == False and self.covstatus == False:
+            print('Uncertainties and covariance matrix not informed')
+            return None
+        elif self.uncstatus == True and self.usecov == False:
+            print('Error propagation without covariance')
+            # set the appropriate cov matrix
+            npar = len(self.params)
+            unc = self.parunc
+            covmatrix = np.empty((npar,npar),float)
+            
+            for i in range(npar):
+                for j in range(npar):
+                    if i==j:
+                        covmatrix[i][j] = unc[i]**2
+                    else:
+                        covmatrix[i][j] = 0.0
+                        
+        else:
+            print('Error propagation with covariance')
+            covmatrix = np.array(self.covmatrix) # converts to numpy array
+                      
+        
+        grad = np.array([self.CalcGrad(x)]) #converts list in numpy array (line matrix)
+        gradT = grad.T # transpose (column matrix)
+        
+        if grad.all() == None:
+            print('Error in gradient calculation. Aborting...')
+            return None
+        
+        gradT_cov = covmatrix.dot(gradT)
+        error2 = grad.dot(gradT_cov)[0][0]
+        
+        return np.sqrt(error2)  
+        
+        
+        
     #def genParams(self,x)   # generate normal distributed parameters
     #def evalMCError(self,x) # evaluate error prop with MC
     
