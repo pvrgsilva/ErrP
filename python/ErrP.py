@@ -1,5 +1,7 @@
 # ErrP class definition
 
+# Transform all lists to ndarray?
+
 import numpy as np #functions need numpy module
 
 class ErrP:
@@ -9,7 +11,7 @@ class ErrP:
                  parunc=None,
                  covmatrix=None,
                  func_model=None,
-                 nsample = 1):
+                 nsample = int(1e5)):
 
         """Constructor.
         Parameters (optional):
@@ -71,8 +73,9 @@ Function defined: {}
 Parameters informed: {}
 Uncertainties informed: {}
 Cov matrix informed: {}
-Using Covariance: {}""".format(self.name,self.funcstatus,self.parstatus,
-                               self.uncstatus,self.covstatus,self.usecov)
+Using Covariance: {}
+Nsample: {}""".format(self.name,self.funcstatus,self.parstatus,
+                  self.uncstatus,self.covstatus,self.usecov,self.nsample)
         return text
 
 
@@ -212,7 +215,7 @@ Using Covariance: {}""".format(self.name,self.funcstatus,self.parstatus,
         """
 
         params = self.params
-        sigma = self.unc
+        sigma = self.parunc
 
         parmc = np.random.normal(params,sigma)
 
@@ -255,17 +258,18 @@ Using Covariance: {}""".format(self.name,self.funcstatus,self.parstatus,
             return None
         elif self.uncstatus == True and self.usecov == False:
             print('Error propagation without covariance')
-
             for _ in range(Nsample):
                 parmc = self.GenParMC(x)
                 vcentral.append(model(x,parmc))
 
-        else:
+        elif self.usecov == True:
             print('Error propagation with covariance')
 
             for _ in range(Nsample):
                 parmc = self.GenParMCCov(x)
                 vcentral.append(model(x,parmc))
+        else:
+            print('Something went bad... Verify inputs...')
 
         # calculating average values and standard deviations
 
