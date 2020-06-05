@@ -8,7 +8,8 @@ class ErrP:
                  params=None,
                  parunc=None,
                  covmatrix=None,
-                 func_model=None):
+                 func_model=None,
+                 nsample = 1):
 
         """Constructor. Optional parameter name."""
 
@@ -21,7 +22,7 @@ class ErrP:
         self.parunc = parunc        # model parameters uncertainties
         self.covmatrix = covmatrix   # covariance matrix
         self.model = func_model # model function
-
+        self.nsample = nsample
 
         #status variables
 
@@ -99,6 +100,9 @@ Using Covariance: {}""".format(self.name,self.funcstatus,self.parstatus,
 
         self.covstatus = True
         self.usecov = True
+
+    def SetNsample(self,x):
+        self.nsample = int(x)
 
 
     def CalcModel(self,x):
@@ -200,6 +204,42 @@ Using Covariance: {}""".format(self.name,self.funcstatus,self.parstatus,
 
         return parmc
 
+    def CalcErrorMC(self,x):
+
+        Nsample = self.nsample
+        model = self.model
+        vcentral = []
+
+        if self.funcstatus == False:
+            print('Function model not informed')
+            return None
+        elif self.parstatus == False:
+            print('Parameters not informed')
+            return None
+        elif self.uncstatus == False and self.covstatus == False:
+            print('Uncertainties and covariance matrix not informed')
+            return None
+        elif self.uncstatus == True and self.usecov == False:
+            print('Error propagation without covariance')
+
+            for _ in range(Nsample):
+                parmc = self.GenParMC(x)
+                vcentral.append(model(x,parmc))
+
+        else:
+            print('Error propagation with covariance')
+
+            for _ in range(Nsample):
+                parmc = self.GenParMCCov(x)
+                vcentral.append(model(x,parmc))
+
+        # calculating average values and standard deviations
+
+        vcentral_array = np.array(vcentral)
+        mean = np.mean(vcentral_array)
+        std = np.std(vcentral_array,ddof=1)
+
+        return std
 
 
     #def evalMCError(self,x) # evaluate error prop with MC
