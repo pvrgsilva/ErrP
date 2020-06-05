@@ -11,7 +11,17 @@ class ErrP:
                  func_model=None,
                  nsample = 1):
 
-        """Constructor. Optional parameter name."""
+        """Constructor.
+        Parameters (optional):
+        'name': name of the model;
+        'params': parameter central values;
+        'parunc': parameter uncertainties;
+        'covmatrix': covariance matrix (ndarray or path to file with matrix);
+        'func_model': model function;
+        'nsample': number of samples to be calculated when using Monte Carlo.
+
+        All these parameters can be set using functions defined below.
+        """
 
         #print('Creating object')
 
@@ -67,23 +77,24 @@ Using Covariance: {}""".format(self.name,self.funcstatus,self.parstatus,
 
 
     def SetModelName(self,name):
-        """Set model name"""
+        """Set model name."""
         self.name=name
 
     def UseCovMatrix(self,option=False):
-        """Set if user wants to use covariance matrix"""
+        """Set if user wants to use covariance matrix."""
         self.usecov = option
 
     def SetModel(self,func_model):
-        """Set model function"""
+        """Set model function."""
         self.model = func_model
 
     def SetParameters(self,user_par):
+        """Set parameters central values."""
         self.params = user_par
         self.parstatus = True
 
     def SetParErrors(self,user_errors):
-        """Set parameters uncertantines"""
+        """Set parameters uncertantines."""
         self.parunc = user_errors
         self.uncstatus = True
 
@@ -102,11 +113,12 @@ Using Covariance: {}""".format(self.name,self.funcstatus,self.parstatus,
         self.usecov = True
 
     def SetNsample(self,x):
+        """Set the number of samples to be generated when using MonteCarlo."""
         self.nsample = int(x)
 
 
     def CalcModel(self,x):
-        """Evaluates the model passed by the user with given parameters for x"""
+        """Evaluates the model passed by the user with given parameters for x."""
         model = self.model
         par = self.params
         #function expect parameters
@@ -117,7 +129,9 @@ Using Covariance: {}""".format(self.name,self.funcstatus,self.parstatus,
 
 
     def CalcGrad(self,x): #calculate gradient
-        """ Evaluates the Gradient of Model """
+        """ Evaluates the Gradient of the model in point x.
+        Derivatives are obtained with forward finite diferences.
+        Returns a list with gradient components."""
 
         if self.funcstatus == False:
             print('Function model not informed')
@@ -144,6 +158,10 @@ Using Covariance: {}""".format(self.name,self.funcstatus,self.parstatus,
 
 
     def CalcErrorGrad(self,x): #calculate error prop with derivatives
+        """Calculates error using derivatives (gradient),
+        with or without covariance matrix.
+        Returns the error.
+        """
 
         if self.funcstatus == False:
             print('Function model not informed')
@@ -185,8 +203,13 @@ Using Covariance: {}""".format(self.name,self.funcstatus,self.parstatus,
 
         return np.sqrt(error2)
 
+
 # generate normal distributed parameters
     def GenParMC(self,x):
+        """Generate normal distributed parameters from
+        central values and uncertainties (without covariance matrix).
+        Returns a ndarray with parameters values.
+        """
 
         params = self.params
         sigma = self.unc
@@ -196,6 +219,10 @@ Using Covariance: {}""".format(self.name,self.funcstatus,self.parstatus,
         return parmc
 
     def GenParMCCov(self,x):
+        """Generate normal distributed parameters from
+        central values and covariance matrix.
+        Returns a ndarray with parameters values.
+        """
 
         params = self.params
         covmatrix = self.covmatrix
@@ -205,6 +232,13 @@ Using Covariance: {}""".format(self.name,self.funcstatus,self.parstatus,
         return parmc
 
     def CalcErrorMC(self,x):
+        """Calculates Error from normal distributed random parameters generated
+        from central values and uncertainties, with or without covariance
+        matrix. Returns a dictionary with two keys:
+        'mean': mean value of central value from Nsample samples;
+        'std': standard deviavion from the Nsample generated and
+               corresponds to the propagated error.
+        """
 
         Nsample = self.nsample
         model = self.model
@@ -238,8 +272,6 @@ Using Covariance: {}""".format(self.name,self.funcstatus,self.parstatus,
         vcentral_array = np.array(vcentral)
         mean = np.mean(vcentral_array)
         std = np.std(vcentral_array,ddof=1)
+        res = {'mean': mean, 'std': std}
 
-        return std
-
-
-    #def evalMCError(self,x) # evaluate error prop with MC
+        return res
